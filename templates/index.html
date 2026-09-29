@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EduGenie - AI Learning Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="card">
+    <h1>🧞 EduGenie</h1>
+    <p>Your AI Academic Assistant</p>
+    
+    <select id="task">
+        <option value="qa">Ask a Question</option>
+        <option value="explain">Understand a Concept</option>
+        <option value="quiz">Make a Practice Quiz</option>
+        <option value="summarize">Summarize Notes</option>
+        <option value="learn">Plan a Learning Path</option>
+    </select>
+
+    <select id="level">
+        <option>Beginner</option>
+        <option>Intermediate</option>
+        <option>Advanced</option>
+    </select>
+
+    <textarea id="text" rows="8" placeholder="Enter your question or notes here... (min 2 chars, max 12000)" maxlength="12000" oninput="document.getElementById('count').innerText=this.value.length+' / 12000'"></textarea>
+    <div id="count">0 / 12000</div>
+
+    <button id="btn" onclick="run()">Generate ✨</button>
+    
+    <pre id="result">Result will appear here...</pre>
+</div>
+
+<script>
+async function run(){
+    const task = document.getElementById('task').value;
+    const level = document.getElementById('level').value;
+    const text = document.getElementById('text').value;
+    const btn = document.getElementById('btn');
+    const result = document.getElementById('result');
+    
+    let url = '/'+task;
+    if(task==='learn') url='/learn/recommendations';
+    
+    btn.innerText='Thinking...';
+    result.innerText='Putting together a clear, helpful response...';
+    
+    const res = await fetch(url, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({text, level})
+    });
+    const data = await res.json();
+    if(data.answer) result.innerText=data.answer;
+    else result.innerText=JSON.stringify(data, null, 2);
+    btn.innerText='Generate ✨';
+}
+</script>
+</body>
+</html>
